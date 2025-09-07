@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>IT 3 - Research Basics Quiz</title>
+  <style>
+    body {
+      background-color: #121212;
+      color: #e0e0e0;
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    h1, h2 {
+      color: #ffffff;
+    }
+    .question {
+      margin-bottom: 20px;
+      padding: 15px;
+      background: #1e1e1e;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #000;
+    }
+    label {
+      display: block;
+      margin: 5px 0;
+    }
+    select, input[type="radio"] {
+      margin-right: 8px;
+    }
+    button {
+      background: #6200ea;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover {
+      background: #3700b3;
+    }
+    #result {
+      margin-top: 20px;
+      font-size: 20px;
+      font-weight: bold;
+      color: #03dac6;
+    }
+  .style1 {color: #FFCC00}
+  .style2 {color: #33FFFF}
+  .style3 {color: #99FF00}
+  </style>
+</head>
+<body>
+  <h1>IT 3 - Research Basics Quiz</h1>
+  <form id="quizForm">
+
+    <h2 class="style1">Part 1: Matching-Type (Functions of Research)</h2>
+<p>Match Column A (Functions) with Column B (Examples).</p>
+
+<table border="0" cellpadding="10" style="width:100%; color:#e0e0e0;">
+  <thead>
+    <tr>
+      <th style="text-align:left;"><span class="style2">Column A: Functions</span></th>
+      <th style="text-align:left;"><span class="style3">Column B: Examples</span></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>A. Categorize &rarr; 
+        <select name="matchA">
+          <option value="">--Select--</option>
+          <option value="1">1</option><option value="2">2</option>
+          <option value="3">3</option><option value="4">4</option>
+          <option value="5">5</option><option value="6">6</option>
+          <option value="7">7</option><option value="8">8</option>
+        </select>
+      </td>
+      <td>1. Analyzing the relationship between rainfall intensity and areas affected by flooding in Metro Manila.</td>
+    </tr>
+    <tr>
+      <td>B. Describe &rarr; 
+        <select name="matchB">
+          <option value="">--Select--</option>
+          <option value="1">1</option><option value="2">2</option>
+          <option value="3">3</option><option value="4">4</option>
+          <option value="5">5</option><option value="6">6</option>
+          <option value="7">7</option><option value="8">8</option>
+        </select>
+      </td>
+      <td>2. Recording how students interact with a new online platform during class sessions.</td>
+    </tr>
+    <tr>
+      <td>C. Explain &rarr; 
+        <select name="matchC">  <option value="">--Select--</option>
+          <option value="1">1</option><option value="2">2</option>
+          <option value="3">3</option><option value="4">4</option>
+          <option value="5">5</option><option value="6">6</option>
+          <option value="7">7</option><option value="8">8</option> </select>
+      </td>
+      <td>3. Assessing the performance of two database systems to identify which handles heavy traffic better.</td>
+    </tr>
+    <tr>
+      <td>D. Evaluate &rarr; 
+        <select name="matchD">  <option value="">--Select--</option>
+          <option value="1">1</option><option value="2">2</option>
+          <option value="3">3</option><option value="4">4</option>
+          <option value="5">5</option><option value="6">6</option>
+          <option value="7">7</option><option value="8">8</option> </select>
+      </td>
+      <td>4. Grouping different types of cyber incidents into distinct classes.</td>
+    </tr>
+    <tr>
+      <td>E. Compare &rarr; 
+        <select name="matchE">  <option value="">--Select--</option>
+          <option value="1">1</option><option value="2">2</option>
+          <option value="3">3</option><option value="4">4</option>
+          <option value="5">5</option><option value="6">6</option>
+          <option value="7">7</option><option value="8">8</option> </select>
+      </td>
+      <td>5. Estimating the likelihood of city flooding based on historical rainfall and drainage data.</td>
+    </tr>
+    <tr>
+      <td>F. Correlate &rarr; 
+        <select name="matchF">  <option value="">--Select--</option>
+          <option value="1">1</option><option value="2">2</option>
+          <option value="3">3</option><option value="4">4</option>
+          <option value="5">5</option><option value="6">6</option>
+          <option value="7">7</option><option value="8">8</option> </select>
+      </td>
+      <td>6. Reviewing a recently implemented online grading system to determine its effectiveness.</td>
+    </tr>
+    <tr>
+      <td>G. Predict &rarr; 
+        <select name="matchG">  <option value="">--Select--</option>
+          <option value="1">1</option><option value="2">2</option>
+          <option value="3">3</option><option value="4">4</option>
+          <option value="5">5</option><option value="6">6</option>
+          <option value="7">7</option><option value="8">8</option> </select>
+      </td>
+      <td>7. Managing flood risk by operating water pumps and regulating dam water levels during storms.</td>
+    </tr>
+    <tr>
+      <td>H. Control &rarr; 
+        <select name="matchH">  <option value="">--Select--</option>
+          <option value="1">1</option><option value="2">2</option>
+          <option value="3">3</option><option value="4">4</option>
+          <option value="5">5</option><option value="6">6</option>
+          <option value="7">7</option><option value="8">8</option> </select>
+      </td>
+      <td>8. Investigating why students prefer using mobile apps for assignments instead of desktops.</td>
+    </tr>
+  </tbody>
+</table>
+
+
+    <!-- Multiple Choice -->
+    <h2 class="style1">Part 2: Multiple Choice (Characteristics of Research)</h2>
+    <div class="question">
+      <p>1. Which characteristic of research emphasizes that findings must be based on observations or practical experience rather than opinions?</p>
+      <label><input type="radio" name="mcq1" value="A"> A. Logical</label>
+      <label><input type="radio" name="mcq1" value="B"> B. Empirical</label>
+      <label><input type="radio" name="mcq1" value="C"> C. Critical</label>
+      <label><input type="radio" name="mcq1" value="D"> D. Replicable</label>
+    </div>
+    <div class="question">
+      <p>2. When research is designed so that others can repeat the procedures and get similar results, it is considered:</p>
+      <label><input type="radio" name="mcq2" value="A"> A. Analytical</label>
+      <label><input type="radio" name="mcq2" value="B"> B. Cyclical</label>
+      <label><input type="radio" name="mcq2" value="C"> C. Replicable</label>
+      <label><input type="radio" name="mcq2" value="D"> D. Empirical</label>
+    </div>
+    <div class="question">
+      <p>3. Which characteristic involves using reasoning and structured methods to ensure that conclusions are valid?</p>
+      <label><input type="radio" name="mcq3" value="A"> A. Logical</label>
+      <label><input type="radio" name="mcq3" value="B"> B. Critical</label>
+      <label><input type="radio" name="mcq3" value="C"> C. Analytical</label>
+      <label><input type="radio" name="mcq3" value="D"> D. Cyclical</label>
+    </div>
+    <div class="question">
+      <p>4. Identifying a problem, researching its cause, implementing a solution, and then revisiting the problem reflects which characteristic?</p>
+      <label><input type="radio" name="mcq4" value="A"> A. Replicable</label>
+      <label><input type="radio" name="mcq4" value="B"> B. Analytical</label>
+      <label><input type="radio" name="mcq4" value="C"> C. Empirical</label>
+      <label><input type="radio" name="mcq4" value="D"> D. Cyclical</label>
+    </div>
+    <div class="question">
+      <p>5. Breaking down complex problems and applying statistical or descriptive methods to interpret data is a feature of:</p>
+      <label><input type="radio" name="mcq5" value="A"> A. Critical</label>
+      <label><input type="radio" name="mcq5" value="B"> B. Analytical</label>
+      <label><input type="radio" name="mcq5" value="C"> C. Logical</label>
+      <label><input type="radio" name="mcq5" value="D"> D. Empirical</label>
+    </div>
+    <div class="question">
+      <p>6. Carefully evaluating sources and data to ensure accuracy and reliability demonstrates which characteristic?</p>
+      <label><input type="radio" name="mcq6" value="A"> A. Critical</label>
+      <label><input type="radio" name="mcq6" value="B"> B. Replicable</label>
+      <label><input type="radio" name="mcq6" value="C"> C. Cyclical</label>
+      <label><input type="radio" name="mcq6" value="D"> D. Empirical</label>
+    </div>
+
+    <!-- Scenario-Based -->
+    <h2 class="style1">Part 3: Scenario-Based (Types of Research)</h2>
+    <div class="question">
+      <p>1. A computer science researcher studies the mathematical limits of machine learning algorithms without any immediate intention to implement them.</p>
+      <label><input type="radio" name="scq1" value="A"> A. Pure Research</label>
+      <label><input type="radio" name="scq1" value="B"> B. Applied Research</label>
+      <label><input type="radio" name="scq1" value="C"> C. Action Research</label>
+    </div>
+    <div class="question">
+      <p>2. A group of IT students develops a mobile app that automatically tracks attendance for all classes in the university. Their goal is to solve a practical problem for students and teachers.</p>
+      <label><input type="radio" name="scq2" value="A"> A. Pure Research</label>
+      <label><input type="radio" name="scq2" value="B"> B. Applied Research</label>
+      <label><input type="radio" name="scq2" value="C"> C. Action Research</label>
+    </div>
+    <div class="question">
+      <p>3. A teacher tests a new grading method in her classroom and adjusts it weekly based on student performance and feedback to improve learning outcomes.</p>
+      <label><input type="radio" name="scq3" value="A"> A. Pure Research</label>
+      <label><input type="radio" name="scq3" value="B"> B. Applied Research</label>
+      <label><input type="radio" name="scq3" value="C"> C. Action Research</label>
+    </div>
+    <div class="question">
+      <p>4. A researcher explores the theoretical foundations of blockchain to understand how decentralized systems work, without building an actual application.</p>
+      <label><input type="radio" name="scq4" value="A"> A. Pure Research</label>
+      <label><input type="radio" name="scq4" value="B"> B. Applied Research</label>
+      <label><input type="radio" name="scq4" value="C"> C. Action Research</label>
+    </div>
+    <div class="question">
+      <p>5. An engineering team creates a new algorithm to optimize database queries for faster processing in a cloud system.</p>
+      <label><input type="radio" name="scq5" value="A"> A. Pure Research</label>
+      <label><input type="radio" name="scq5" value="B"> B. Applied Research</label>
+      <label><input type="radio" name="scq5" value="C"> C. Action Research</label>
+    </div>
+    <div class="question">
+      <p>6. A school principal implements a new digital payment system in the canteen and modifies it in real time according to student and staff usage patterns.</p>
+      <label><input type="radio" name="scq6" value="A"> A. Pure Research</label>
+      <label><input type="radio" name="scq6" value="B"> B. Applied Research</label>
+      <label><input type="radio" name="scq6" value="C"> C. Action Research</label>
+    </div>
+
+    <button type="button" onclick="submitQuiz()">Submit Quiz</button>
+  </form>
+  <div id="result"></div>
+
+  <script>
+    function submitQuiz() {
+  const form = document.getElementById('quizForm');
+  const formData = new FormData(form);
+
+  // Check unanswered
+  for (let [key, value] of formData.entries()) {
+    if (value === "") {
+      alert("Please answer all questions before submitting.");
+      return;
+    }
+  }
+  const requiredRadioGroups = ["mcq1","mcq2","mcq3","mcq4","mcq5","mcq6","scq1","scq2","scq3","scq4","scq5","scq6"];
+  for (let group of requiredRadioGroups) {
+    if (!formData.get(group)) {
+      alert("Please answer all questions before submitting.");
+      return;
+    }
+  }
+
+  // Answer keys
+  const answers = {
+    matchA: "4", matchB: "2", matchC: "8", matchD: "6",
+    matchE: "3", matchF: "1", matchG: "5", matchH: "7",
+    mcq1: "B", mcq2: "C", mcq3: "A", mcq4: "D",
+    mcq5: "B", mcq6: "A",
+    scq1: "A", scq2: "B", scq3: "C",
+    scq4: "A", scq5: "B", scq6: "C"
+  };
+
+  let score = 0;
+  let total = Object.keys(answers).length;
+
+  for (let key in answers) {
+    if (formData.get(key) === answers[key]) {
+      score++;
+    }
+  }
+
+  document.getElementById("result").textContent = `Your Score: ${score} / ${total}`;
+
+  // ?? Hide the form after submit
+  form.style.display = "none";
+}
+
+  </script>
+</body>
+</html>
