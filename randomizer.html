@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Name Randomizer (Dark Numbered)</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #121212;
+      color: #eaeaea;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      margin-bottom: 10px;
+      color: #ffffff;
+    }
+    textarea {
+      width: 300px;
+      height: 150px;
+      padding: 10px;
+      font-size: 14px;
+      margin-bottom: 15px;
+      resize: none;
+      background: #1e1e1e;
+      color: #ffffff;
+      border: 1px solid #333;
+      border-radius: 5px;
+    }
+    button {
+      padding: 10px 20px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-bottom: 20px;
+      transition: background 0.3s ease;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    #output {
+      width: 300px;
+      background: #1e1e1e;
+      border: 1px solid #333;
+      padding: 10px;
+      min-height: 100px;
+      border-radius: 5px;
+    }
+    #output strong {
+      display: block;
+      margin-bottom: 8px;
+      color: #ffffff;
+    }
+    #output ol {
+      padding-left: 20px;
+      margin: 0;
+    }
+    #output li {
+      color: #eaeaea;
+    }
+  </style>
+</head>
+<body>
+  <h1>IT 3 - Report Randomizer</h1>
+  <textarea id="names" placeholder="Enter names here, one per line"></textarea>
+  <button onclick="randomizeNames()">Randomize</button>
+  <div id="output"><strong>Randomized Names:</strong>
+    <!-- changed ul to ol -->
+    <ol id="result"></ol>
+  </div>
+
+  <script>
+    function randomizeNames() {
+      const input = document.getElementById('names').value.trim();
+      if (!input) {
+        alert("Please enter at least one name.");
+        return;
+      }
+      let names = input.split('\n').map(n => n.trim()).filter(n => n !== '');
+      // Fisher–Yates shuffle
+      for (let i = names.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [names[i], names[j]] = [names[j], names[i]];
+      }
+      // Display
+      const result = document.getElementById('result');
+      result.innerHTML = '';
+      names.forEach(name => {
+        const li = document.createElement('li');
+        li.textContent = name;
+        result.appendChild(li);
+      });
+    }
+  </script>
+</body>
+</html>
