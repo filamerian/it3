@@ -1,0 +1,2122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Research Rumble: Tech Tug of War</title>
+    <style>
+        :root {
+            --bg-dark: #070913;
+            --bg-panel: #0d1117;
+            --bg-card: rgba(22, 27, 34, 0.85);
+            --border-color: rgba(56, 139, 253, 0.25);
+            --border-glow: rgba(0, 240, 255, 0.4);
+            
+            --blue-team: #00f0ff;
+            --blue-team-glow: rgba(0, 240, 255, 0.6);
+            --blue-team-dark: #005580;
+            
+            --red-team: #ff2a6d;
+            --red-team-glow: rgba(255, 42, 109, 0.6);
+            --red-team-dark: #800020;
+            
+            --neon-gold: #ffcc00;
+            --neon-green: #00ff88;
+            --text-main: #f0f6fc;
+            --text-muted: #8b949e;
+            
+            --font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: var(--font-stack);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 50% 20%, rgba(0, 240, 255, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255, 42, 109, 0.08) 0%, transparent 50%),
+                linear-gradient(rgba(7, 9, 19, 0.9), rgba(7, 9, 19, 0.95));
+        }
+
+        /* Ambient Animated Grid & Circuit Background */
+        .bg-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.15;
+            background-size: 40px 40px;
+            background-image: 
+                linear-gradient(to right, rgba(0, 240, 255, 0.3) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(0, 240, 255, 0.3) 1px, transparent 1px);
+        }
+
+        .app-container {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            max-width: 1600px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 12px;
+        }
+
+        /* Top Header Navigation & Status */
+        header {
+            background: rgba(13, 17, 23, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            margin-bottom: 12px;
+            gap: 15px;
+        }
+
+        .title-block {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .title-block h1 {
+            font-size: 1.5rem;
+            font-weight: 900;
+            letter-spacing: 2px;
+            background: linear-gradient(90deg, var(--blue-team), #ffffff, var(--red-team));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+            text-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
+        }
+
+        .subtitle {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 600;
+        }
+
+        .match-stats-bar {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            background: rgba(0,0,0,0.4);
+            padding: 6px 16px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .stat-label {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-value {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--neon-gold);
+            font-family: monospace;
+        }
+
+        /* Position Indicator Gauge */
+        .position-gauge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 8px;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 6px 16px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            font-family: monospace;
+            font-size: 0.85rem;
+        }
+
+        .pos-tick {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 0.75rem;
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-muted);
+            transition: all 0.3s ease;
+        }
+
+        .pos-tick.blue-side { color: var(--blue-team); border: 1px solid rgba(0, 240, 255, 0.3); }
+        .pos-tick.red-side { color: var(--red-team); border: 1px solid rgba(255, 42, 109, 0.3); }
+        .pos-tick.center-side { color: var(--neon-gold); border: 1px solid rgba(255, 204, 0, 0.4); }
+
+        .pos-tick.active-flag {
+            transform: scale(1.35);
+            background: #ffffff;
+            color: #000;
+            box-shadow: 0 0 12px #ffffff;
+            font-weight: 900;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-icon {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: var(--text-main);
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .btn-icon:hover {
+            background: rgba(0, 240, 255, 0.15);
+            border-color: var(--blue-team);
+            transform: translateY(-2px);
+            box-shadow: 0 0 10px var(--blue-team-glow);
+        }
+
+        /* Tug of War Arena Section */
+        .arena-container {
+            position: relative;
+            background: rgba(13, 17, 23, 0.85);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.8), 0 8px 32px rgba(0,0,0,0.6);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Turn Indicator Banner */
+        .turn-banner {
+            width: 100%;
+            padding: 8px 16px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-size: 1rem;
+            margin-bottom: 10px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.5);
+        }
+
+        .turn-banner.blue-turn {
+            background: linear-gradient(90deg, rgba(0, 240, 255, 0.1), rgba(0, 240, 255, 0.3), rgba(0, 240, 255, 0.1));
+            border: 1px solid var(--blue-team);
+            color: var(--blue-team);
+            box-shadow: 0 0 20px var(--blue-team-glow);
+        }
+
+        .turn-banner.red-turn {
+            background: linear-gradient(90deg, rgba(255, 42, 109, 0.1), rgba(255, 42, 109, 0.3), rgba(255, 42, 109, 0.1));
+            border: 1px solid var(--red-team);
+            color: var(--red-team);
+            box-shadow: 0 0 20px var(--red-team-glow);
+        }
+
+        /* Canvas Arena */
+        #arenaCanvas {
+            width: 100%;
+            height: 220px;
+            background: radial-gradient(ellipse at center, rgba(16, 26, 43, 0.8) 0%, rgba(7, 9, 19, 0.95) 100%);
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.08);
+            display: block;
+        }
+
+        /* Main Game Content Layout */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            flex-grow: 1;
+        }
+
+        /* Question & Answer Card */
+        .question-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+            position: relative;
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .question-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .badge {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .badge-difficulty-easy { background: rgba(0, 255, 136, 0.15); color: var(--neon-green); border: 1px solid var(--neon-green); }
+        .badge-difficulty-medium { background: rgba(255, 204, 0, 0.15); color: var(--neon-gold); border: 1px solid var(--neon-gold); }
+        .badge-difficulty-hard { background: rgba(255, 42, 109, 0.15); color: var(--red-team); border: 1px solid var(--red-team); }
+
+        .question-category {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .timer-badge {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--neon-gold);
+            font-family: monospace;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(0,0,0,0.4);
+            padding: 4px 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,204,0,0.3);
+        }
+
+        .question-body {
+            font-size: 1.25rem;
+            line-height: 1.5;
+            color: #ffffff;
+            font-weight: 600;
+            margin-bottom: 20px;
+            min-height: 60px;
+        }
+
+        /* Choices Grid */
+        .choices-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        @media (max-width: 768px) {
+            .choices-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .choice-btn {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 10px;
+            padding: 14px 16px;
+            color: var(--text-main);
+            font-size: 1rem;
+            font-weight: 500;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .choice-key {
+            width: 28px;
+            height: 28px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            flex-shrink: 0;
+        }
+
+        .choice-btn:hover:not(:disabled) {
+            background: rgba(0, 240, 255, 0.08);
+            border-color: var(--blue-team);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 240, 255, 0.2);
+        }
+
+        .choice-btn:hover:not(:disabled) .choice-key {
+            background: var(--blue-team);
+            color: var(--bg-dark);
+        }
+
+        .choice-btn.selected {
+            background: rgba(0, 240, 255, 0.18);
+            border-color: var(--blue-team);
+            box-shadow: 0 0 15px var(--blue-team-glow);
+        }
+
+        .choice-btn.correct {
+            background: rgba(0, 255, 136, 0.25) !important;
+            border-color: var(--neon-green) !important;
+            color: #ffffff !important;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.5) !important;
+        }
+
+        .choice-btn.wrong {
+            background: rgba(255, 42, 109, 0.25) !important;
+            border-color: var(--red-team) !important;
+            color: #ffffff !important;
+            box-shadow: 0 0 20px rgba(255, 42, 109, 0.5) !important;
+        }
+
+        /* Explanation Box */
+        .explanation-box {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border-glow);
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            color: #d1d5db;
+            display: none;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .explanation-box strong {
+            color: var(--neon-gold);
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        /* Action Row Controls */
+        .action-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--blue-team-dark), var(--blue-team));
+            border: none;
+            color: #000;
+            font-weight: 800;
+            padding: 12px 24px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 15px var(--blue-team-glow);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px var(--blue-team-glow);
+            filter: brightness(1.2);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--text-main);
+            font-weight: 700;
+            padding: 12px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: #fff;
+        }
+
+        button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed !important;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        /* Cyber Hype Toast Popup */
+        .hype-toast {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: rgba(13, 17, 23, 0.95);
+            border: 2px solid var(--neon-gold);
+            box-shadow: 0 0 30px rgba(255, 204, 0, 0.6);
+            border-radius: 16px;
+            padding: 16px 32px;
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: var(--neon-gold);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            pointer-events: none;
+            z-index: 10;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s;
+            opacity: 0;
+            text-align: center;
+        }
+
+        .hype-toast.active {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
+
+        /* Modal Windows (Teacher Controls, Settings, Victory Screen) */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(10px);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            padding: 20px;
+        }
+
+        .modal-overlay.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-card {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-glow);
+            border-radius: 20px;
+            max-width: 650px;
+            width: 100%;
+            padding: 28px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .modal-title {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--blue-team);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-close {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .modal-close:hover {
+            color: #fff;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 8px;
+            padding: 10px 14px;
+            color: #fff;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-input:focus, .form-select:focus {
+            border-color: var(--blue-team);
+            box-shadow: 0 0 10px var(--blue-team-glow);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        /* Victory Screen Specifics */
+        .victory-content {
+            text-align: center;
+            padding: 10px 0;
+        }
+
+        .victory-trophy {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 16px;
+            animation: pulse 2s infinite ease-in-out;
+        }
+
+        .victory-team-name {
+            font-size: 2.2rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+        }
+
+        .victory-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin: 20px 0;
+            background: rgba(0,0,0,0.3);
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .v-stat-card {
+            text-align: center;
+            padding: 8px;
+        }
+
+        .v-stat-val {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--neon-gold);
+            font-family: monospace;
+        }
+
+        .v-stat-lbl {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 15px rgba(255, 204, 0, 0.6)); }
+            50% { transform: scale(1.08); filter: drop-shadow(0 0 25px rgba(255, 204, 0, 0.9)); }
+        }
+
+        /* Keyboard shortcuts bar */
+        .shortcuts-hint {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-top: 10px;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .key-badge {
+            background: rgba(255,255,255,0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #fff;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-grid"></div>
+
+    <div class="app-container">
+        <!-- Top Header Navigation -->
+        <header>
+            <div class="title-block">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="#00f0ff"/>
+                </svg>
+                <div>
+                    <h1>RESEARCH RUMBLE</h1>
+                    <div class="subtitle">BSIT Quantitative Methods Tug of War</div>
+                </div>
+            </div>
+
+            <div class="match-stats-bar">
+                <div class="stat-item">
+                    <span class="stat-label">Round</span>
+                    <span class="stat-value" id="currentRoundDisplay">1 / 20</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Blue Score</span>
+                    <span class="stat-value" id="blueScoreDisplay" style="color: var(--blue-team);">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Red Score</span>
+                    <span class="stat-value" id="redScoreDisplay" style="color: var(--red-team);">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Accuracy</span>
+                    <span class="stat-value" id="accuracyDisplay">100%</span>
+                </div>
+            </div>
+
+            <div class="header-actions">
+                <button class="btn-icon" id="soundToggleBtn" onClick="toggleSound()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+                    <span id="soundBtnText">Audio</span>
+                </button>
+                <button class="btn-icon" onClick="openTeacherModal()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                    <span>Teacher Control</span>
+                </button>
+                <button class="btn-icon" onClick="toggleFullscreen()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- Tug of War Arena Section -->
+        <div class="arena-container">
+            <div class="turn-banner blue-turn" id="turnBanner">
+                <span id="turnBannerIcon">🤖</span>
+                <span id="turnBannerText">Blue Team's Turn to Answer!</span>
+            </div>
+
+            <!-- Arena Canvas drawing the Tug of war rope, dynamic flag, and robots -->
+            <canvas id="arenaCanvas"></canvas>
+
+            <!-- 11 Position Discrete Track UI -->
+            <div class="position-gauge" id="positionGauge">
+                <!-- Dynamic Ticks Rendered via JS -->
+            </div>
+        </div>
+
+        <!-- Main Question & Answers Card -->
+        <main class="main-content">
+            <div class="question-card">
+                <div class="hype-toast" id="hypeToast">DATA MASTER!</div>
+
+                <div class="question-header">
+                    <div class="question-meta">
+                        <span class="badge badge-difficulty-easy" id="difficultyBadge">MEDIUM</span>
+                        <span class="question-category" id="categoryDisplay">Introduction to Research</span>
+                    </div>
+
+                    <div class="timer-badge" id="timerContainer">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                        <span id="timerDisplay">20s</span>
+                    </div>
+                </div>
+
+                <div class="question-body" id="questionText">
+                    Loading research question...
+                </div>
+
+                <div class="choices-grid" id="choicesGrid">
+                    <!-- Dynamic Choices Buttons -->
+                </div>
+
+                <div class="explanation-box" id="explanationBox">
+                    <strong>💡 Research Insight:</strong>
+                    <span id="explanationText"></span>
+                </div>
+
+                <div class="action-row">
+                    <button class="btn-secondary" id="skipBtn" onClick="skipQuestion()">
+                        Skip Question
+                    </button>
+                    <button class="btn-primary" id="submitBtn" onClick="submitAnswer()" disabled>
+                        Submit Answer
+                    </button>
+                </div>
+            </div>
+        </main>
+
+        <div class="shortcuts-hint">
+            <span>Keys: <span class="key-badge">1 - 4</span> Select Option</span> |
+            <span><span class="key-badge">Enter</span> Submit</span> |
+            <span><span class="key-badge">Space</span> Skip</span> |
+            <span><span class="key-badge">P</span> Pause Timer</span>
+        </div>
+    </div>
+
+    <!-- Teacher Controls Modal -->
+    <div class="modal-overlay" id="teacherModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
+                    Teacher Command Console
+                </div>
+                <button class="modal-close" onClick="closeTeacherModal()">&times;</button>
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label">Blue Team Name</label>
+                    <input type="text" class="form-input" id="blueTeamNameInput" value="Cyber Knights">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Red Team Name</label>
+                    <input type="text" class="form-input" id="redTeamNameInput" value="Quantum Syndicate">
+                </div>
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label">Timer Setting</label>
+                    <select class="form-select" id="timerSettingSelect">
+                        <option value="0">No Timer (Manual)</option>
+                        <option value="15">15 Seconds</option>
+                        <option value="20" selected>20 Seconds</option>
+                        <option value="30">30 Seconds</option>
+                        <option value="60">60 Seconds</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Question Count</label>
+                    <select class="form-select" id="matchLengthSelect">
+                        <option value="10">10 Questions</option>
+                        <option value="20" selected>20 Questions</option>
+                        <option value="30">30 Questions</option>
+                        <option value="50">50 Questions</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label">Difficulty Filter</label>
+                    <select class="form-select" id="difficultyFilterSelect">
+                        <option value="all" selected>All Difficulties (Mixed)</option>
+                        <option value="Easy">Easy Only</option>
+                        <option value="Medium">Medium Only</option>
+                        <option value="Hard">Hard Only</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Tug Sensitivity (Step Size)</label>
+                    <select class="form-select" id="stepSizeSelect">
+                        <option value="0.1">Normal (10 steps to edge)</option>
+                        <option value="0.15" selected>Fast (7 steps to edge)</option>
+                        <option value="0.25">Sudden Death (4 steps to edge)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap;">
+                <button class="btn-secondary" style="flex: 1;" onClick="revealCurrentAnswer()">Reveal Answer</button>
+                <button class="btn-secondary" style="flex: 1;" onClick="toggleTimerPause()" id="pauseTimerBtn">Pause Timer</button>
+                <button class="btn-secondary" style="flex: 1;" onClick="shuffleRemainingQuestions()">Shuffle Remaining</button>
+            </div>
+
+            <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between;">
+                <button class="btn-secondary" style="color: var(--red-team); border-color: var(--red-team);" onClick="resetMatch()">Reset Match</button>
+                <button class="btn-primary" onClick="applyTeacherSettings()">Save & Apply</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Victory Modal -->
+    <div class="modal-overlay" id="victoryModal">
+        <div class="modal-card">
+            <div class="victory-content">
+                <!-- SVG Trophy -->
+                <svg class="victory-trophy" viewBox="0 0 24 24" fill="none" stroke="var(--neon-gold)" stroke-width="1.5">
+                    <path d="M6 9C6 11.7614 8.23858 14 11 14H13C15.7614 14 18 11.7614 18 9V3H6V9Z" fill="rgba(255,204,0,0.2)"/>
+                    <path d="M6 5H3C2.44772 5 2 5.44772 2 6V7C2 8.65685 3.34315 10 5 10H6"/>
+                    <path d="M18 5H21C21.5523 5 22 5.44772 22 6V7C22 8.65685 20.6569 10 19 10H18"/>
+                    <path d="M12 14V18M8 21H16M12 18H8M12 18H16"/>
+                </svg>
+
+                <div class="subtitle" style="color: var(--neon-gold);">RESEARCH CHAMPIONS</div>
+                <div class="victory-team-name" id="winnerTeamName">BLUE TEAM</div>
+
+                <div class="victory-stats-grid">
+                    <div class="v-stat-card">
+                        <div class="v-stat-val" id="vStatCorrect">0</div>
+                        <div class="v-stat-lbl">Total Correct</div>
+                    </div>
+                    <div class="v-stat-card">
+                        <div class="v-stat-val" id="vStatAccuracy">0%</div>
+                        <div class="v-stat-lbl">Overall Accuracy</div>
+                    </div>
+                    <div class="v-stat-card">
+                        <div class="v-stat-val" id="vStatStreak">0</div>
+                        <div class="v-stat-lbl">Best Streak</div>
+                    </div>
+                    <div class="v-stat-card">
+                        <div class="v-stat-val" id="vStatDuration">0m 0s</div>
+                        <div class="v-stat-lbl">Match Duration</div>
+                    </div>
+                </div>
+
+                <button class="btn-primary" style="width: 100%; justify-content: center;" onClick="resetMatch(); closeVictoryModal();">
+                    Play Again
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        
+        // --- EASY & RAPID-FIRE QUESTION DATABASE (BSIT RESEARCH & QUANTITATIVE METHODS) ---
+        const QUESTIONS_DATABASE = [
+            {
+                q: "What is the primary goal of scientific research?",
+                options: ["To find direct evidence and factual truth", "To guess random answers", "To win debate games", "To increase social media likes"],
+                correct: 0,
+                difficulty: "Easy",
+                category: "Research Basics",
+                explanation: "Research systematically collects observable evidence to answer questions and establish facts."
+            },
+            {
+                q: "Which variable is changed or manipulated directly by the experimenter?",
+                options: ["Dependent Variable", "Independent Variable", "Random Variable", "Constant Variable"],
+                correct: 1,
+                difficulty: "Easy",
+                category: "Variables",
+                explanation: "The Independent Variable is the input or cause manipulated to test its effect."
+            },
+            {
+                q: "What is the variable that measures the outcome or effect in an experiment?",
+                options: ["Dependent Variable", "Independent Variable", "Control Variable", "Dummy Variable"],
+                correct: 0,
+                difficulty: "Easy",
+                category: "Variables",
+                explanation: "The Dependent Variable is the result or output being measured."
+            },
+            {
+                q: "Copying someone else's code or research writing without giving credit is called what?",
+                options: ["Innovation", "Plagiarism", "Compilation", "Data Mining"],
+                correct: 1,
+                difficulty: "Easy",
+                category: "Ethics",
+                explanation: "Plagiarism is using another person's work without permission or citation."
+            },
+            {
+                q: "What does SUS stand for in BSIT software usability testing?",
+                options: ["System Usability Scale", "Software Utility System", "Standard User Script", "Simple Unit Setup"],
+                correct: 0,
+                difficulty: "Easy",
+                category: "BSIT Research",
+                explanation: "SUS (System Usability Scale) is a popular 10-item questionnaire for testing software usability."
+            },
+            {
+                q: "A statement predicting 'no difference or no relationship' between variables is called what?",
+                options: ["Alternative Hypothesis", "Null Hypothesis", "Research Problem", "Conclusion"],
+                correct: 1,
+                difficulty: "Easy",
+                category: "Hypothesis",
+                explanation: "The Null Hypothesis (H0) states that there is no significant effect or relationship."
+            },
+            {
+                q: "Which data scale has categories with order but no equal numerical distance (e.g., Low, Medium, High)?",
+                options: ["Nominal Scale", "Ordinal Scale", "Ratio Scale", "Binary Scale"],
+                correct: 1,
+                difficulty: "Easy",
+                category: "Measurement",
+                explanation: "Ordinal scale ranks data in order without exact numerical intervals."
+            },
+            {
+                q: "Which scale of measurement has a true absolute zero point (e.g., Speed in KB/s)?",
+                options: ["Ratio Scale", "Ordinal Scale", "Nominal Scale", "Interval Scale"],
+                correct: 0,
+                difficulty: "Easy",
+                category: "Measurement",
+                explanation: "Ratio scale possesses a real zero point, allowing direct ratio comparisons."
+            },
+            {
+                q: "What type of research applies technical solutions to solve real-world industry problems?",
+                options: ["Basic Research", "Applied Research", "Historical Research", "Pure Research"],
+                correct: 1,
+                difficulty: "Easy",
+                category: "Research Types",
+                explanation: "Applied research directly solves practical practical problems."
+            },
+            {
+                q: "In statistics, what metric represents the exact middle number in an ordered list of data?",
+                options: ["Mean", "Median", "Mode", "Variance"],
+                correct: 1,
+                difficulty: "Easy",
+                category: "Statistics",
+                explanation: "The median is the center value when numbers are sorted in order."
+            },
+            {
+                q: "What is the average of a group of numbers called in statistics?",
+                options: ["Mean", "Median", "Mode", "Range"],
+                correct: 0,
+                difficulty: "Easy",
+                category: "Statistics",
+                explanation: "The arithmetic mean is calculated by adding all scores and dividing by the count."
+            },
+            {
+                q: "What is the most frequently occurring value in a dataset?",
+                options: ["Mode", "Mean", "Median", "Standard Deviation"],
+                correct: 0,
+                difficulty: "Easy",
+                category: "Statistics",
+                explanation: "The mode is the number that appears most often in a dataset."
+            },
+            {
+                q: "What ethics document is required before collecting data from human participants?",
+                options: ["Informed Consent", "Software License", "Copyright Notice", "NDA"],
+                correct: 0,
+                difficulty: "Easy",
+                category: "Ethics",
+                explanation: "Informed consent informs participants about research goals and risks before participation."
+            },
+            {
+                q: "Which software development methodology uses short iterative cycles and user feedback?",
+                options: ["Waterfall", "Agile Methodology", "Linear Flow", "Manual Method"],
+                correct: 1,
+                difficulty: "Easy",
+                category: "BSIT Methods",
+                explanation: "Agile focuses on continuous improvement and quick iterative prototypes."
+            },
+            {
+                q: "What is a major advantage of Quantitative Research?",
+                options: ["Uses measurable numbers and statistical analysis", "Rely on personal opinions only", "Requires no testing", "Has no structure"],
+                correct: 0,
+                difficulty: "Easy",
+                category: "Research Types",
+                explanation: "Quantitative research relies on numerical measurements and objective statistics."
+            },
+            {
+                q: "What document provides a concise summary of an entire research paper at the beginning?",
+                options: ["Abstract", "Glossary", "Index", "Appendix"],
+                correct: 0,
+                difficulty: "Easy",
+                category: "Writing",
+                explanation: "An abstract briefly summarizes the problem, methods, results, and conclusion."
+            },
+            {
+                q: "In an experiment testing internet speed vs. distance, what is distance?",
+                options: ["Independent Variable", "Dependent Variable", "Extraneous Variable", "Result"],
+                correct: 0,
+                difficulty: "Easy",
+                category: "Variables",
+                explanation: "Distance is controlled/changed by the tester, so it is the Independent Variable."
+            },
+            {
+                q: "In an experiment testing internet speed vs. distance, what is the measured download speed?",
+                options: ["Dependent Variable", "Independent Variable", "Fixed Constant", "Predictor"],
+                correct: 0,
+                difficulty: "Easy",
+                category: "Variables",
+                explanation: "Download speed is the outcome being measured, making it the Dependent Variable."
+            },
+            {
+                q: "What term describes how consistent and repeatable a test or measurement tool is?",
+                options: ["Reliability", "Validity", "Speed", "Flexibility"],
+                correct: 0,
+                difficulty: "Easy",
+                category: "Metrics",
+                explanation: "Reliability means getting the same result consistently when repeating the test."
+            },
+            {
+                q: "What term describes whether a research tool accurately measures what it is intended to measure?",
+                options: ["Validity", "Reliability", "Simplicity", "Quantity"],
+                correct: 0,
+                difficulty: "Easy",
+                category: "Metrics",
+                explanation: "Validity indicates accuracy—ensuring the instrument measures the real concept."
+            },
+            {
+                q: "What visual diagram maps system data flow and process logic in BSIT research?",
+                options: ["Data Flow Diagram (DFD)", "Pie Chart", "Histogram", "Scatter Plot"],
+                correct: 0,
+                difficulty: "Easy",
+                category: "Tools",
+                explanation: "DFD models how data moves through an information system."
+            },
+            {
+                q: "What is the group in an experiment that does NOT receive the special treatment called?",
+                options: ["Control Group", "Experimental Group", "Test Group", "Sample Group"],
+                correct: 0,
+                difficulty: "Easy",
+                category: "Research Basics",
+                explanation: "The control group serves as a baseline comparison group."
+            },
+            {
+                q: "What sampling method gives every person in a population an equal chance of being selected?",
+                options: ["Simple Random Sampling", "Convenience Sampling", "Purposive Sampling", "Quota Sampling"],
+                correct: 0,
+                difficulty: "Easy",
+                category: "Sampling",
+                explanation: "Simple random sampling ensures unbiased selection probability."
+            },
+            {
+                q: "Selecting survey participants simply because they are nearby and convenient is called what?",
+                options: ["Convenience Sampling", "Random Sampling", "Stratified Sampling", "Systematic Sampling"],
+                correct: 0,
+                difficulty: "Easy",
+                category: "Sampling",
+                explanation: "Convenience sampling picks easily accessible participants."
+            },
+            {
+                q: "What statistical test measures the linear correlation strength between two continuous variables?",
+                options: ["Pearson Correlation (r)", "Bar Graph", "Flowchart", "Standard Error"],
+                correct: 0,
+                difficulty: "Easy",
+                category: "Statistics",
+                explanation: "Pearson's r measures direction and strength of linear relationship."
+            },
+            {
+                q: "In research ethics, what is deliberate fabrication of fake data called?",
+                options: ["Data Fabrication", "Citation", "Peer Review", "Data Collection"],
+                correct: 0,
+                difficulty: "Easy",
+                category: "Ethics",
+                explanation: "Fabrication is inventing completely fake data."
+            },
+            {
+                q: "What standard p-value threshold is most commonly used to claim statistical significance?",
+                options: ["p < 0.05", "p > 0.50", "p = 1.00", "p < 0.99"],
+                correct: 0,
+                difficulty: "Easy",
+                category: "Statistics",
+                explanation: "p < 0.05 means less than 5% probability the result occurred by random chance."
+            },
+            {
+                q: "What research section outlines the boundaries and deliberate limits of a study?",
+                options: ["Scope and Delimitation", "Title Page", "Recommendation", "Reference List"],
+                correct: 0,
+                difficulty: "Easy",
+                category: "Writing",
+                explanation: "Scope and Delimitation defines what is included and excluded from the study."
+            },
+            {
+                q: "What model evaluates technology adoption based on Perceived Usefulness and Perceived Ease of Use?",
+                options: ["TAM (Technology Acceptance Model)", "Waterfall Model", "TCP/IP Model", "OSI Model"],
+                correct: 0,
+                difficulty: "Easy",
+                category: "BSIT Models",
+                explanation: "TAM measures user acceptance of new technological systems."
+            },
+            {
+                q: "What is data collected directly first-hand by the researchers called?",
+                options: ["Primary Data", "Secondary Data", "Tertiary Data", "Historical Data"],
+                correct: 0,
+                difficulty: "Easy",
+                category: "Data Collection",
+                explanation: "Primary data is original data gathered directly for the specific research."
+            },
+            {
+                q: "What is data gathered from previously published books, journals, or online repositories called?",
+                options: ["Secondary Data", "Primary Data", "Raw Data", "Direct Observation"],
+                correct: 0,
+                difficulty: "Easy",
+                category: "Data Collection",
+                explanation: "Secondary data comes from existing published sources."
+            },
+            {
+                q: "Which research design studies a single system or project in its real-life context?",
+                options: ["Case Study", "Lab Experiment", "Pure Simulation", "Calculus Model"],
+                correct: 0,
+                difficulty: "Easy",
+                category: "Research Designs",
+                explanation: "A case study investigates a real-life system or organization in-depth."
+            },
+            {
+                q: "What is the first step in the scientific research process?",
+                options: ["Identifying the Research Problem", "Writing Conclusions", "Publishing Paper", "Drawing Graphs"],
+                correct: 0,
+                difficulty: "Easy",
+                category: "Process",
+                explanation: "Research always begins with defining a clear problem statement."
+            },
+            {
+                q: "What type of questions offer pre-determined fixed response choices (e.g., Yes/No, Multiple Choice)?",
+                options: ["Closed-Ended Questions", "Open-Ended Questions", "Essay Questions", "Discussion Questions"],
+                correct: 0,
+                difficulty: "Easy",
+                category: "Data Collection",
+                explanation: "Closed-ended questions provide specific set choices for easy quantitative analysis."
+            },
+            {
+                q: "What research framework reviews existing theories that support your study?",
+                options: ["Theoretical Framework", "Budget Plan", "Gantt Chart", "User Manual"],
+                correct: 0,
+                difficulty: "Easy",
+                category: "Writing",
+                explanation: "Theoretical framework grounds your study in established theories."
+            },
+            {
+                q: "What is the list of all books, articles, and websites cited at the end of a research paper?",
+                options: ["References / Bibliography", "Table of Contents", "Glossary", "Acknowlegments"],
+                correct: 0,
+                difficulty: "Easy",
+                category: "Writing",
+                explanation: "The reference list provides full citation details for consulted sources."
+            },
+            {
+                q: "What standard survey metric assesses internal reliability of Likert scales?",
+                options: ["Cronbach's Alpha", "Speedometer", "CPU Clock Rate", "Ping Latency"],
+                correct: 0,
+                difficulty: "Easy",
+                category: "Statistics",
+                explanation: "Cronbach's alpha checks internal consistency among survey items."
+            },
+            {
+                q: "In simulation research, what does Monte Carlo simulation use to model complex outcomes?",
+                options: ["Repeated Random Sampling", "Manual Handwriting", "Static CSS Styles", "HTML Tags"],
+                correct: 0,
+                difficulty: "Easy",
+                category: "Simulation",
+                explanation: "Monte Carlo uses random sampling to calculate probabilistic outcomes."
+            },
+            {
+                q: "What type of graph uses vertical bars to display frequencies of continuous numerical data?",
+                options: ["Histogram", "Pie Chart", "Venn Diagram", "Flowchart"],
+                correct: 0,
+                difficulty: "Easy",
+                category: "Statistics",
+                explanation: "Histograms show frequency distributions across continuous intervals."
+            },
+            {
+                q: "What term describes keeping participant identities private and protected from public exposure?",
+                options: ["Confidentiality", "Publicity", "Broadcasting", "Marketing"],
+                correct: 0,
+                difficulty: "Easy",
+                category: "Ethics",
+                explanation: "Confidentiality ensures personal identity and sensitive responses remain private."
+            },
+            {
+                q: "What is a preliminary software version built to test research feasibility called?",
+                options: ["Prototype", "Final Release", "Legacy System", "Deprecated Code"],
+                correct: 0,
+                difficulty: "Easy",
+                category: "BSIT Research",
+                explanation: "A prototype is an early working sample used to test concepts."
+            },
+            {
+                q: "What metric measures the spread of data relative to its mean?",
+                options: ["Standard Deviation", "Sample Size", "Title Length", "Font Size"],
+                correct: 0,
+                difficulty: "Easy",
+                category: "Statistics",
+                explanation: "Standard deviation quantifies how far numbers spread out from the average."
+            },
+            {
+                q: "What is the set of all individuals or items that a researcher wants to draw conclusions about?",
+                options: ["Population", "Sample", "Subset", "Focus Group"],
+                correct: 0,
+                difficulty: "Easy",
+                category: "Sampling",
+                explanation: "The population is the total group under study."
+            },
+            {
+                q: "What is a smaller subset selected from a population to represent the whole group?",
+                options: ["Sample", "Population", "Database", "Server"],
+                correct: 0,
+                difficulty: "Easy",
+                category: "Sampling",
+                explanation: "A sample is the smaller group measured to infer facts about the population."
+            },
+            {
+                q: "What type of variable remains constant and unchanged throughout an experiment?",
+                options: ["Control Variable", "Independent Variable", "Dependent Variable", "Random Variable"],
+                correct: 0,
+                difficulty: "Easy",
+                category: "Variables",
+                explanation: "Control variables are kept constant to avoid distorting results."
+            },
+            {
+                q: "In IT Capstone projects, what section outlines future software expansion possibilities?",
+                options: ["Recommendations", "Abstract", "Problem Statement", "Dedication"],
+                correct: 0,
+                difficulty: "Easy",
+                category: "Writing",
+                explanation: "Recommendations suggest future work and system improvements."
+            },
+            {
+                q: "What research error occurs when you wrongly reject a True Null Hypothesis?",
+                options: ["Type I Error", "Type II Error", "Compilation Error", "Syntax Error"],
+                correct: 0,
+                difficulty: "Easy",
+                category: "Statistics",
+                explanation: "Type I error is a false positive (rejecting a true null hypothesis)."
+            },
+            {
+                q: "What research error occurs when you fail to reject a False Null Hypothesis?",
+                options: ["Type II Error", "Type I Error", "Logic Error", "Runtime Error"],
+                correct: 0,
+                difficulty: "Easy",
+                category: "Statistics",
+                explanation: "Type II error is a false negative (failing to detect a real effect)."
+            },
+            {
+                q: "What is a testable operational statement derived from research questions called?",
+                options: ["Hypothesis", "Anecdote", "Opinion", "Slogan"],
+                correct: 0,
+                difficulty: "Easy",
+                category: "Research Basics",
+                explanation: "A hypothesis is a testable prediction about research variables."
+            },
+            {
+                q: "Why is research called 'Empirical'?",
+                options: ["It relies on direct observation and factual data", "It relies on theoretical guesswork", "It uses only opinions", "It requires no proof"],
+                correct: 0,
+                difficulty: "Easy",
+                category: "Research Basics",
+                explanation: "Empirical means grounded in real, observable data and evidence."
+            }
+        ];
+
+        // --- WEB AUDIO API SYNTHESIZER FOR SOUND EFFECTS ---
+        class SoundFX {
+            constructor() {
+                this.ctx = null;
+                this.enabled = true;
+            }
+
+            init() {
+                if (!this.ctx) {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    this.ctx = new AudioContext();
+                }
+            }
+
+            playClick() {
+                if (!this.enabled) return;
+                this.init();
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(600, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(200, this.ctx.currentTime + 0.05);
+                gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.05);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.05);
+            }
+
+            playCorrect() {
+                if (!this.enabled) return;
+                this.init();
+                const now = this.ctx.currentTime;
+                const freqs = [523.25, 659.25, 783.99, 1046.50]; // C Major Arpeggio
+                freqs.forEach((freq, idx) => {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(freq, now + idx * 0.08);
+                    gain.gain.setValueAtTime(0.2, now + idx * 0.08);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.08 + 0.2);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start(now + idx * 0.08);
+                    osc.stop(now + idx * 0.08 + 0.2);
+                });
+            }
+
+            playWrong() {
+                if (!this.enabled) return;
+                this.init();
+                const now = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(180, now);
+                osc.frequency.exponentialRampToValueAtTime(70, now + 0.3);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            }
+
+            playPull() {
+                if (!this.enabled) return;
+                this.init();
+                const now = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(100, now);
+                osc.frequency.linearRampToValueAtTime(300, now + 0.2);
+                gain.gain.setValueAtTime(0.25, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(now);
+                osc.stop(now + 0.25);
+            }
+
+            playVictory() {
+                if (!this.enabled) return;
+                this.init();
+                const now = this.ctx.currentTime;
+                const notes = [440, 554.37, 659.25, 880, 659.25, 880];
+                notes.forEach((freq, i) => {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = 'square';
+                    osc.frequency.setValueAtTime(freq, now + i * 0.12);
+                    gain.gain.setValueAtTime(0.15, now + i * 0.12);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.12 + 0.25);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start(now + i * 0.12);
+                    osc.stop(now + i * 0.12 + 0.25);
+                });
+            }
+        }
+
+        const sound = new SoundFX();
+
+
+        // --- GAME ENGINE STATE MANAGEMENT ---
+        const gameState = {
+            blueTeamName: "Blue Team",
+            redTeamName: "Red Team",
+            currentTurn: "blue", // "blue" or "red"
+            blueScore: 0,
+            redScore: 0,
+            totalCorrect: 0,
+            totalAnswered: 0,
+            currentStreak: 0,
+            bestStreak: 0,
+            
+            // DISCRETE 11 POSITIONS: -5 (Blue Win) to +5 (Red Win). Starts at 0 (Center)
+            discretePosition: 0, 
+            ropePosition: 0.0,
+            targetRopePosition: 0.0,
+
+            questionPool: [],
+            currentQuestionIdx: 0,
+            selectedOptionIdx: null,
+            timerValue: 20,
+            defaultTimer: 20,
+            timerInterval: null,
+            isTimerPaused: false,
+            
+            difficultyFilter: "all",
+            totalMatchQuestions: 20,
+            matchStartTime: null,
+            particles: [],
+            hypeMessages: ["EXCELLENT!", "DATA MASTER!", "BSIT GENIUS!", "FAST PULL!", "QUANTUM LEAP!", "OUTSTANDING!"]
+        };
+
+        // --- ARENA CANVAS RENDERING ENGINE ---
+        let canvas, ctx;
+
+        function initCanvas() {
+            canvas = document.getElementById('arenaCanvas');
+            ctx = canvas.getContext('2d');
+            resizeCanvas();
+            renderPositionGaugeUI();
+            window.addEventListener('resize', resizeCanvas);
+            requestAnimationFrame(renderArena);
+        }
+
+        // Render Discrete 11-Position Gauge Bar Under Canvas
+        function renderPositionGaugeUI() {
+            const gauge = document.getElementById('positionGauge');
+            if (!gauge) return;
+
+            let html = `<span style="color:var(--blue-team); font-weight:800; font-size:0.75rem; margin-right:4px;">BLUE WIN</span>`;
+            
+            // Positions: -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5
+            for (let pos = -5; pos <= 5; pos++) {
+                let label = Math.abs(pos);
+                if (pos === 0) label = "0";
+
+                let sideClass = pos < 0 ? "blue-side" : (pos > 0 ? "red-side" : "center-side");
+                let activeClass = (gameState.discretePosition === pos) ? "active-flag" : "";
+
+                html += `<div class="pos-tick ${sideClass} ${activeClass}" id="tick_${pos}">${label}</div>`;
+            }
+
+            html += `<span style="color:var(--red-team); font-weight:800; font-size:0.75rem; margin-left:4px;">RED WIN</span>`;
+            gauge.innerHTML = html;
+        }
+
+        function resizeCanvas() {
+            if (!canvas) return;
+            canvas.width = canvas.parentElement.clientWidth - 32;
+            canvas.height = 220;
+        }
+
+        // Particle system for pull sparks & victory fireworks
+        function spawnSparks(x, y, color) {
+            for (let i = 0; i < 15; i++) {
+                gameState.particles.push({
+                    x: x,
+                    y: y,
+                    vx: (Math.random() - 0.5) * 8,
+                    vy: (Math.random() - 0.5) * 8,
+                    life: 1.0,
+                    color: color,
+                    size: Math.random() * 4 + 2
+                });
+            }
+        }
+
+        function renderArena() {
+            if (!ctx) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const width = canvas.width;
+            const height = canvas.height;
+            const centerY = height / 2 + 10;
+
+            // Map discretePosition (-5 to +5) to continuous target normalized position (-1.0 to +1.0)
+            gameState.targetRopePosition = gameState.discretePosition / 5.0;
+
+            // Smooth Interpolation for realistic fluid movement
+            gameState.ropePosition += (gameState.targetRopePosition - gameState.ropePosition) * 0.12;
+
+            // Compute Flag Center X position based on normalized ropePosition (-1 to +1)
+            const margin = 120;
+            const centerPointX = width / 2;
+            const maxTravel = (width / 2) - margin;
+            const flagX = centerPointX + (gameState.ropePosition * maxTravel);
+
+            // 1. Draw Field Boundary Markers & Cyber Grid Lines
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
+            ctx.beginPath();
+            ctx.moveTo(margin, 20); ctx.lineTo(margin, height - 20);
+            ctx.moveTo(width - margin, 20); ctx.lineTo(width - margin, height - 20);
+            ctx.moveTo(centerPointX, 30); ctx.lineTo(centerPointX, height - 30);
+            ctx.stroke();
+
+            // Draw 11 Discrete Position Tick Marks on Canvas
+            for (let i = -5; i <= 5; i++) {
+                const tickX = centerPointX + (i / 5.0) * maxTravel;
+                ctx.beginPath();
+                ctx.lineWidth = i === 0 ? 3 : 1;
+                ctx.strokeStyle = i === 0 ? "rgba(255, 204, 0, 0.6)" : "rgba(255, 255, 255, 0.2)";
+                ctx.moveTo(tickX, centerY - 15);
+                ctx.lineTo(tickX, centerY + 15);
+                ctx.stroke();
+            }
+
+            // Goal Zones Glow
+            // Blue Victory Zone (Left)
+            ctx.fillStyle = "rgba(0, 240, 255, 0.06)";
+            ctx.fillRect(0, 0, margin, height);
+            ctx.fillStyle = "#00f0ff";
+            ctx.font = "bold 11px monospace";
+            ctx.fillText("BLUE WIN", 20, 25);
+
+            // Red Victory Zone (Right)
+            ctx.fillStyle = "rgba(255, 42, 109, 0.06)";
+            ctx.fillRect(width - margin, 0, margin, height);
+            ctx.fillStyle = "#ff2a6d";
+            ctx.fillText("RED WIN", width - 80, 25);
+
+            // 2. Draw Futuristic Cybernetic Rope
+            ctx.beginPath();
+            ctx.lineWidth = 8;
+            ctx.strokeStyle = "#2a364f";
+            ctx.moveTo(40, centerY);
+            ctx.lineTo(width - 40, centerY);
+            ctx.stroke();
+
+            // Inner glowing core of the rope
+            const ropeGrad = ctx.createLinearGradient(0, 0, width, 0);
+            ropeGrad.addColorStop(0, "#00f0ff");
+            ropeGrad.addColorStop(0.5, "#ffffff");
+            ropeGrad.addColorStop(1, "#ff2a6d");
+            
+            ctx.beginPath();
+            ctx.lineWidth = 4;
+            ctx.strokeStyle = ropeGrad;
+            ctx.moveTo(40, centerY);
+            ctx.lineTo(width - 40, centerY);
+            ctx.stroke();
+
+            // 3. Draw Robot Avatars (Left: Blue, Right: Red)
+            const blueRobotX = Math.max(20, flagX - 160);
+            const redRobotX = Math.min(width - 20, flagX + 160);
+
+            drawCyberRobot(ctx, blueRobotX, centerY, "blue", gameState.currentTurn === "blue");
+            drawCyberRobot(ctx, redRobotX, centerY, "red", gameState.currentTurn === "red");
+
+            // 4. Draw Central Glowing Research Flag / Marker
+            ctx.save();
+            ctx.translate(flagX, centerY);
+
+            // Flag Pulse Glow Effect
+            const glowSize = 15 + Math.sin(Date.now() * 0.005) * 5;
+            ctx.shadowColor = gameState.discretePosition < 0 ? "#00f0ff" : (gameState.discretePosition > 0 ? "#ff2a6d" : "#ffcc00");
+            ctx.shadowBlur = glowSize;
+
+            // Flag Pole
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(-2, -50, 4, 60);
+
+            // Flag Banner
+            ctx.fillStyle = gameState.discretePosition < 0 ? "#00f0ff" : (gameState.discretePosition > 0 ? "#ff2a6d" : "#ffcc00");
+            ctx.beginPath();
+            ctx.moveTo(2, -50);
+            ctx.lineTo(35, -35);
+            ctx.lineTo(2, -20);
+            ctx.closePath();
+            ctx.fill();
+
+            // Flag Research Emblem
+            ctx.font = "16px sans-serif";
+            ctx.textAlign = "center";
+            ctx.fillText("🎓", 0, 20);
+            ctx.restore();
+
+            // 5. Update & Draw Particles
+            for (let i = gameState.particles.length - 1; i >= 0; i--) {
+                let p = gameState.particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.life -= 0.03;
+
+                ctx.fillStyle = p.color;
+                ctx.globalAlpha = Math.max(0, p.life);
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+
+                if (p.life <= 0) {
+                    gameState.particles.splice(i, 1);
+                }
+            }
+            ctx.globalAlpha = 1.0;
+
+            requestAnimationFrame(renderArena);
+        }
+
+        // Draw High-Tech Vector SVG Style Robot
+        function drawCyberRobot(ctx, x, y, team, isActive) {
+            ctx.save();
+            ctx.translate(x, y);
+
+            const teamColor = team === "blue" ? "#00f0ff" : "#ff2a6d";
+            const scale = team === "blue" ? 1 : -1;
+            ctx.scale(scale, 1);
+
+            // Breathing / Pulling Animation offset
+            const bounce = isActive ? Math.sin(Date.now() * 0.01) * 4 : 0;
+
+            // Shadow
+            ctx.fillStyle = "rgba(0,0,0,0.4)";
+            ctx.beginPath();
+            ctx.ellipse(0, 35, 25, 8, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Body Chassis
+            ctx.fillStyle = "#161b22";
+            ctx.strokeStyle = teamColor;
+            ctx.lineWidth = 2;
+
+            // Legs
+            ctx.fillRect(-15, 10 + bounce, 10, 25);
+            ctx.fillRect(5, 10 + bounce, 10, 25);
+
+            // Torso
+            ctx.beginPath();
+            ctx.roundRect(-20, -25 + bounce, 40, 35, 6);
+            ctx.fill();
+            ctx.stroke();
+
+            // Cyber Core Light
+            ctx.fillStyle = teamColor;
+            ctx.shadowColor = teamColor;
+            ctx.shadowBlur = isActive ? 12 : 4;
+            ctx.beginPath();
+            ctx.arc(0, -10 + bounce, 6, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Head / Visor
+            ctx.fillStyle = "#0d1117";
+            ctx.beginPath();
+            ctx.roundRect(-14, -45 + bounce, 28, 18, 4);
+            ctx.fill();
+            ctx.stroke();
+
+            // Glowing Visor Line
+            ctx.fillRect(-10, -39 + bounce, 20, 4);
+
+            // Robot Hands Holding Rope
+            ctx.fillStyle = teamColor;
+            ctx.beginPath();
+            ctx.arc(18, 0 + bounce, 5, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.restore();
+        }
+
+        // --- GAME LOGIC CONTROLLER ---
+
+        function initGame() {
+            initCanvas();
+            setupQuestionsPool();
+            gameState.matchStartTime = Date.now();
+            loadQuestion(0);
+        }
+
+        function setupQuestionsPool() {
+            let pool = [...QUESTIONS_DATABASE];
+            
+            // Apply difficulty filter
+            if (gameState.difficultyFilter !== "all") {
+                pool = pool.filter(q => q.difficulty === gameState.difficultyFilter);
+            }
+
+            // Shuffle pool
+            pool.sort(() => Math.random() - 0.5);
+
+            // Limit to match length
+            gameState.questionPool = pool.slice(0, gameState.totalMatchQuestions);
+            gameState.currentQuestionIdx = 0;
+        }
+
+        function loadQuestion(index) {
+            if (index >= gameState.questionPool.length) {
+                checkMatchEnd(true);
+                return;
+            }
+
+            const q = gameState.questionPool[index];
+            gameState.selectedOptionIdx = null;
+
+            // Reset UI
+            document.getElementById('questionText').innerText = q.q;
+            document.getElementById('categoryDisplay').innerText = q.category;
+            
+            const diffBadge = document.getElementById('difficultyBadge');
+            diffBadge.innerText = q.difficulty.toUpperCase();
+            diffBadge.className = `badge badge-difficulty-${q.difficulty.toLowerCase()}`;
+
+            document.getElementById('currentRoundDisplay').innerText = `${index + 1} / ${gameState.questionPool.length}`;
+            document.getElementById('explanationBox').style.display = 'none';
+            document.getElementById('submitBtn').disabled = true;
+
+            // Update Turn Banner
+            const banner = document.getElementById('turnBanner');
+            const teamName = gameState.currentTurn === "blue" ? gameState.blueTeamName : gameState.redTeamName;
+            
+            if (gameState.currentTurn === "blue") {
+                banner.className = "turn-banner blue-turn";
+                document.getElementById('turnBannerIcon').innerText = "🤖";
+                document.getElementById('turnBannerText').innerText = `${teamName}'s Turn to Answer!`;
+            } else {
+                banner.className = "turn-banner red-turn";
+                document.getElementById('turnBannerIcon').innerText = "⚡";
+                document.getElementById('turnBannerText').innerText = `${teamName}'s Turn to Answer!`;
+            }
+
+            // Populate Choices
+            const grid = document.getElementById('choicesGrid');
+            grid.innerHTML = '';
+
+            const keys = ['A', 'B', 'C', 'D'];
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'choice-btn';
+                btn.onclick = () => selectOption(idx);
+                btn.innerHTML = `
+                    <span class="choice-key">${keys[idx]}</span>
+                    <span>${opt}</span>
+                `;
+                grid.appendChild(btn);
+            });
+
+            // Reset & Start Timer
+            resetTimer();
+        }
+
+        function selectOption(idx) {
+            sound.playClick();
+            gameState.selectedOptionIdx = idx;
+
+            const buttons = document.querySelectorAll('.choice-btn');
+            buttons.forEach((btn, i) => {
+                if (i === idx) {
+                    btn.classList.add('selected');
+                } else {
+                    btn.classList.remove('selected');
+                }
+            });
+
+            document.getElementById('submitBtn').disabled = false;
+        }
+
+        function submitAnswer() {
+            if (gameState.selectedOptionIdx === null) return;
+            clearInterval(gameState.timerInterval);
+
+            const q = gameState.questionPool[gameState.currentQuestionIdx];
+            const isCorrect = (gameState.selectedOptionIdx === q.correct);
+            const buttons = document.querySelectorAll('.choice-btn');
+
+            buttons.forEach((btn, i) => {
+                btn.disabled = true;
+                if (i === q.correct) {
+                    btn.classList.add('correct');
+                } else if (i === gameState.selectedOptionIdx && !isCorrect) {
+                    btn.classList.add('wrong');
+                }
+            });
+
+            // Update Stats & Fast 11-Position Discrete Tug Logic
+            gameState.totalAnswered++;
+            if (isCorrect) {
+                sound.playCorrect();
+                sound.playPull();
+                gameState.totalCorrect++;
+                gameState.currentStreak++;
+                if (gameState.currentStreak > gameState.bestStreak) {
+                    gameState.bestStreak = gameState.currentStreak;
+                }
+
+                showHypeToast();
+
+                // CORRECT ANSWER: Move 1 Position toward answering team
+                if (gameState.currentTurn === "blue") {
+                    gameState.blueScore += 100;
+                    gameState.discretePosition -= 1; // move left towards -5
+                    spawnSparks(100, 110, "#00f0ff");
+                } else {
+                    gameState.redScore += 100;
+                    gameState.discretePosition += 1; // move right towards +5
+                    spawnSparks(window.innerWidth - 100, 110, "#ff2a6d");
+                }
+            } else {
+                sound.playWrong();
+                gameState.currentStreak = 0;
+
+                // INCORRECT ANSWER: Move 1 Position toward opposing team
+                if (gameState.currentTurn === "blue") {
+                    gameState.discretePosition += 1; // slip toward Red (+5)
+                } else {
+                    gameState.discretePosition -= 1; // slip toward Blue (-5)
+                }
+            }
+
+            // Clamp position tightly between -5 and +5
+            gameState.discretePosition = Math.max(-5, Math.min(5, gameState.discretePosition));
+            renderPositionGaugeUI();
+
+            // Show Explanation
+            document.getElementById('explanationText').innerText = q.explanation;
+            document.getElementById('explanationBox').style.display = 'block';
+
+            updateHeaderStats();
+
+            // INSTANT WIN CHECK: Reaching Position -5 (Blue) or +5 (Red) triggers immediate victory!
+            setTimeout(() => {
+                if (Math.abs(gameState.discretePosition) >= 5) {
+                    checkMatchEnd(true);
+                } else {
+                    // Switch Turn & Load Next Question
+                    gameState.currentTurn = gameState.currentTurn === "blue" ? "red" : "blue";
+                    gameState.currentQuestionIdx++;
+                    loadQuestion(gameState.currentQuestionIdx);
+                }
+            }, 2200);
+        }
+
+        function skipQuestion() {
+            sound.playClick();
+            clearInterval(gameState.timerInterval);
+            gameState.currentTurn = gameState.currentTurn === "blue" ? "red" : "blue";
+            gameState.currentQuestionIdx++;
+            loadQuestion(gameState.currentQuestionIdx);
+        }
+
+        function resetTimer() {
+            clearInterval(gameState.timerInterval);
+            if (gameState.defaultTimer <= 0) {
+                document.getElementById('timerContainer').style.display = 'none';
+                return;
+            }
+
+            document.getElementById('timerContainer').style.display = 'flex';
+            gameState.timerValue = gameState.defaultTimer;
+            document.getElementById('timerDisplay').innerText = `${gameState.timerValue}s`;
+
+            gameState.timerInterval = setInterval(() => {
+                if (gameState.isTimerPaused) return;
+
+                gameState.timerValue--;
+                document.getElementById('timerDisplay').innerText = `${gameState.timerValue}s`;
+
+                if (gameState.timerValue <= 0) {
+                    clearInterval(gameState.timerInterval);
+                    // Time expired penalty
+                    sound.playWrong();
+                    gameState.selectedOptionIdx = -1; // Wrong selection
+                    submitAnswer();
+                }
+            }, 1000);
+        }
+
+        function updateHeaderStats() {
+            document.getElementById('blueScoreDisplay').innerText = gameState.blueScore;
+            document.getElementById('redScoreDisplay').innerText = gameState.redScore;
+
+            const accuracy = gameState.totalAnswered > 0 
+                ? Math.round((gameState.totalCorrect / gameState.totalAnswered) * 100) 
+                : 100;
+            document.getElementById('accuracyDisplay').innerText = `${accuracy}%`;
+        }
+
+        function showHypeToast() {
+            const toast = document.getElementById('hypeToast');
+            const msg = gameState.hypeMessages[Math.floor(Math.random() * gameState.hypeMessages.length)];
+            toast.innerText = msg;
+            toast.classList.add('active');
+
+            setTimeout(() => {
+                toast.classList.remove('active');
+            }, 1200);
+        }
+
+        function checkMatchEnd(forceEnd = false) {
+            if (forceEnd || gameState.currentQuestionIdx >= gameState.questionPool.length) {
+                sound.playVictory();
+                clearInterval(gameState.timerInterval);
+
+                // Determine Winner based on discrete position (-5 to +5)
+                let winnerName = "";
+                let winnerColor = "";
+                if (gameState.discretePosition <= -1) {
+                    winnerName = gameState.blueTeamName;
+                    winnerColor = "#00f0ff";
+                } else if (gameState.discretePosition >= 1) {
+                    winnerName = gameState.redTeamName;
+                    winnerColor = "#ff2a6d";
+                } else {
+                    winnerName = gameState.blueScore >= gameState.redScore ? gameState.blueTeamName : gameState.redTeamName;
+                    winnerColor = "#ffcc00";
+                }
+
+                // Fill Victory Modal Stats
+                document.getElementById('winnerTeamName').innerText = winnerName;
+                document.getElementById('winnerTeamName').style.color = winnerColor;
+                document.getElementById('vStatCorrect').innerText = `${gameState.totalCorrect} / ${gameState.totalAnswered}`;
+                
+                const accuracy = gameState.totalAnswered > 0 
+                    ? Math.round((gameState.totalCorrect / gameState.totalAnswered) * 100) 
+                    : 0;
+                document.getElementById('vStatAccuracy').innerText = `${accuracy}%`;
+                document.getElementById('vStatStreak').innerText = gameState.bestStreak;
+
+                const elapsedSecs = Math.floor((Date.now() - gameState.matchStartTime) / 1000);
+                const mins = Math.floor(elapsedSecs / 60);
+                const secs = elapsedSecs % 60;
+                document.getElementById('vStatDuration').innerText = `${mins}m ${secs}s`;
+
+                document.getElementById('victoryModal').classList.add('open');
+            }
+        }
+
+        // --- TEACHER CONTROL & MODAL HANDLERS ---
+        function openTeacherModal() {
+            sound.playClick();
+            document.getElementById('teacherModal').classList.add('open');
+        }
+
+        function closeTeacherModal() {
+            sound.playClick();
+            document.getElementById('teacherModal').classList.remove('open');
+        }
+
+        function closeVictoryModal() {
+            sound.playClick();
+            document.getElementById('victoryModal').classList.remove('open');
+        }
+
+        function applyTeacherSettings() {
+            sound.playClick();
+            gameState.blueTeamName = document.getElementById('blueTeamNameInput').value || "Blue Team";
+            gameState.redTeamName = document.getElementById('redTeamNameInput').value || "Red Team";
+            gameState.defaultTimer = parseInt(document.getElementById('timerSettingSelect').value);
+            gameState.totalMatchQuestions = parseInt(document.getElementById('matchLengthSelect').value);
+            gameState.difficultyFilter = document.getElementById('difficultyFilterSelect').value;
+
+            closeTeacherModal();
+            resetMatch();
+        }
+
+        function resetMatch() {
+            gameState.discretePosition = 0;
+            gameState.ropePosition = 0.0;
+            gameState.targetRopePosition = 0.0;
+            gameState.blueScore = 0;
+            gameState.redScore = 0;
+            gameState.totalCorrect = 0;
+            gameState.totalAnswered = 0;
+            gameState.currentStreak = 0;
+            gameState.bestStreak = 0;
+            gameState.currentTurn = "blue";
+            gameState.isTimerPaused = false;
+            document.getElementById('pauseTimerBtn').innerText = "Pause Timer";
+
+            renderPositionGaugeUI();
+            updateHeaderStats();
+            setupQuestionsPool();
+            loadQuestion(0);
+        }
+
+        function revealCurrentAnswer() {
+            sound.playClick();
+            const q = gameState.questionPool[gameState.currentQuestionIdx];
+            selectOption(q.correct);
+        }
+
+        function toggleTimerPause() {
+            sound.playClick();
+            gameState.isTimerPaused = !gameState.isTimerPaused;
+            document.getElementById('pauseTimerBtn').innerText = gameState.isTimerPaused ? "Resume Timer" : "Pause Timer";
+        }
+
+        function shuffleRemainingQuestions() {
+            sound.playClick();
+            let remaining = gameState.questionPool.slice(gameState.currentQuestionIdx);
+            remaining.sort(() => Math.random() - 0.5);
+            gameState.questionPool = gameState.questionPool.slice(0, gameState.currentQuestionIdx).concat(remaining);
+            loadQuestion(gameState.currentQuestionIdx);
+            closeTeacherModal();
+        }
+
+        function toggleSound() {
+            sound.enabled = !sound.enabled;
+            document.getElementById('soundBtnText').innerText = sound.enabled ? "Audio" : "Muted";
+        }
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(e => console.log(e));
+            } else {
+                if (document.exitFullscreen) document.exitFullscreen();
+            }
+        }
+
+        // --- KEYBOARD SHORTCUTS INTEGRATION ---
+        window.addEventListener('keydown', (e) => {
+            if (document.getElementById('teacherModal').classList.contains('open')) return;
+
+            if (e.key >= '1' && e.key <= '4') {
+                const idx = parseInt(e.key) - 1;
+                const buttons = document.querySelectorAll('.choice-btn');
+                if (buttons[idx]) selectOption(idx);
+            } else if (e.key === 'Enter') {
+                if (!document.getElementById('submitBtn').disabled) {
+                    submitAnswer();
+                }
+            } else if (e.key === ' ') {
+                e.preventDefault();
+                skipQuestion();
+            } else if (e.key.toLowerCase() === 'p') {
+                toggleTimerPause();
+            }
+        });
+
+        // Initialize game when window finishes loading
+        window.onload = function() {
+            initGame();
+        };
+    </script>
+</body>
+</html>
